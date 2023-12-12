@@ -1,7 +1,9 @@
+import {readFileSync, writeFileSync} from "fs";
 import {createInterface} from "readline";
 import chalk from "chalk";
 
 const tasks = [];
+const DB_FILE = "tasks.txt";
 
 const rl = createInterface({
   input: process.stdin,
@@ -18,13 +20,38 @@ function displayMenu() {
   console.log("\n");
 }
 
+function loadTasks() {
+  try {
+    const data = readFileSync(DB_FILE, "utf-8");
+    const lines = data.split("\n");
+    tasks.length = 0;
+
+    lines.forEach((line) => {
+      if (line.trim() !== "") {
+        const [task, completed] = line.split("|");
+        tasks.push({task, completed: completed === true});
+      }
+    });
+    console.log(chalk.green.bold("Tareas cargadas con exito! desde la BD\n"));
+  } catch (err) {
+    console.log(chalk.green.bold("No hay tareas pendientes 🥳🥳.\n"));
+  }
+}
+
+function saveTasks() {
+  const data = tasks.map((task) => `${task.task}|${task.completed}`).join("\n");
+  writeFileSync(DB_FILE, data, "utf-8");
+  console.log(chalk.green.bold("Tareas guardadas con exito en la BD!\n"));
+}
+
 function addTask() {
   rl.question(chalk.bgGrey("Ingresa una nueva tarea: "), (task) => {
     tasks.push({task, completed: false});
     console.log(chalk.green.bold("Tarea agregada con exito!\n"));
+    saveTasks();
     displayMenu();
     chooseOption();
-    console.log(tasks);
+    //console.log(tasks);
   });
 }
 
@@ -53,6 +80,7 @@ function completeTask() {
       const task = tasks[index - 1];
       if (task) {
         task.completed = true;
+        saveTasks();
         console.log(chalk.green.bold("\nTarea completada con exito!✅\n"));
       } else {
         console.log(chalk.red.bold("\nTarea no encontrada.❌\n"));
@@ -88,5 +116,6 @@ function chooseOption() {
   });
 }
 
+loadTasks();
 displayMenu();
 chooseOption();

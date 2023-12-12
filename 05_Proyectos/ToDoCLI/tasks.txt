@@ -1,0 +1,3 @@
+Test|true
+Comenzar siguiente aplicacion de optimizar imagenes con node|false
+Terminar curso de node|false
