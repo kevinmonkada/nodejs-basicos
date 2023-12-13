@@ -11,6 +11,31 @@ let inputFolder = "src";
 let outputFolder = "opt";
 let targetWidth = 1920;
 
-const processImage = async () => {};
+const processImage = async () => {
+  try {
+    const files = await fse.readdir(inputFolder);
 
+    for (const file of files) {
+      let inputPath = `${inputFolder}/${file}`;
+      let outputPath = `${outputFolder}/${file}`;
+
+      await sharp(inputPath).resize(targetWidth).toFile(outputPath);
+
+      await imagemin([outputPath], {
+        destination: outputFolder,
+        plugins: [
+          imageminJpegtran({quality: 80}), //Comprimir imagen JPEG con calidad del 80%
+          imageminPngquant(), //Comprimir imagen PNG
+          imageminSvgo(), //Comprimir imagen SVG
+          imageminWebp({quality: 80}), //Comprimir imagen WebP con calidad del 80%
+          imageminGifsicle(), //Comprimir imagen GIF
+        ],
+      });
+      console.log(`Se ha optimizado la imagen: ${file} a formato WebP`);
+    }
+    console.log("Se han optimizado todas tus imágenes");
+  } catch (err) {
+    console.error(err);
+  }
+};
 processImage();
