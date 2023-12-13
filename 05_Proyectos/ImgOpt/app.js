@@ -16,8 +16,20 @@ const processImage = async () => {
     const files = await fse.readdir(inputFolder);
 
     for (const file of files) {
+      // Skip hidden files
+      if (file.startsWith(".")) {
+        console.log(`Skipping hidden file ${file}`);
+        continue;
+      }
       let inputPath = `${inputFolder}/${file}`;
       let outputPath = `${outputFolder}/${file}`;
+
+      const stats = await fse.stat(inputPath);
+      if (stats.isFile()) {
+        console.log(`${inputPath} is a file.`);
+      } else if (stats.isDirectory()) {
+        console.log(`${inputPath} is a directory.`);
+      }
 
       await sharp(inputPath).resize(targetWidth).toFile(outputPath);
 
