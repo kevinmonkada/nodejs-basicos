@@ -3,21 +3,70 @@ let tasks = [
   {id: 2, title: "Task Two", completed: true},
 ];
 
-const getAllTasks = (req, res) => {};
+const getAllTasks = (req, res) => {
+  res.render("index", {title: "Task List", tasks});
+};
 
-const getAddTaskForm = (req, res) => {};
+const getAddTaskForm = (req, res) => {
+  res.render("add", {title: "Add Task"});
+};
 
-const addTask = (req, res) => {};
+const addTask = (req, res) => {
+  let {title} = req.body;
+  console.log(req.body);
+  tasks.push({id: tasks.length + 1, title, completed: false});
+  res.redirect("/");
+};
 
-const getEditTaskForm = (req, res) => {};
+const getEditTaskForm = (req, res) => {
+  let id = parseInt(req.params.id);
+  let task = tasks.find((task) => task.id === id);
 
-const editTask = (req, res) => {};
+  if (!task) {
+    res.redirect("/");
+  } else {
+    res.render("edit", {title: "Edit Task", task});
+  }
+};
 
-const completeTask = (req, res) => {};
+const editTask = (req, res) => {
+  let id = parseInt(req.params.id);
+  let task = tasks.find((task) => task.id === id);
 
-const uncompleteTask = (req, res) => {};
+  if (!task) {
+    res.redirect("/");
+  } else {
+    let {title} = req.body;
+    task.title = title;
+    res.redirect("/");
+  }
+};
 
-const deleteTask = (req, res) => {};
+const completeTask = (req, res) => {
+  let id = parseInt(req.params.id);
+  let task = tasks.find((task) => task.id === id);
+
+  if (task) {
+    task.completed = true;
+  }
+  res.redirect("/");
+};
+
+const uncompleteTask = (req, res) => {
+  let id = parseInt(req.params.id);
+  let task = tasks.find((task) => task.id === id);
+
+  if (task) {
+    task.completed = false;
+  }
+  res.redirect("/");
+};
+
+const deleteTask = (req, res) => {
+  let id = parseInt(req.params.id);
+  tasks = tasks.filter((task) => task.id !== id);
+  res.redirect("/");
+};
 
 export default {
   getAllTasks,
